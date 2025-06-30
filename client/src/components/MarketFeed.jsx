@@ -1,72 +1,66 @@
-import React, { useState } from "react";
-
-const trades = [
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: false },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: false },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: false },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: false },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-  { price: "12,358.47", amount: "0.26548", time: "20:55:36", positive: true },
-];
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {API_BASE} from '../api/api.js'
 const MarketFeed = () => {
-  const [activeTab, setActiveTab] = useState("market");
+  const [activeTab, setActiveTab] = useState('market');
+  const [marketTrades, setMarketTrades] = useState([]);
+  const [myTrades, setMyTrades] = useState([]);
+
+  useEffect(() => {
+    const fetchMarketFeeds = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/api/market-feeds`);
+        setMarketTrades(res.data);
+      } catch (err) {
+        console.error('Error fetching market feeds:', err.message);
+      }
+    };
+
+    fetchMarketFeeds();
+  }, []);
 
   return (
-    <div className="bg-[#121212] p-4 text-white rounded-md text-sm">
-      {/* Tabs */}
-      <div className="flex items-center border-b border-[#282828] mb-2">
-        <button
-          className={`mr-4 pb-2 ${
-            activeTab === "market"
-              ? "text-white border-b-2 border-[#00C896] font-semibold"
-              : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("market")}
-        >
-          Market Trades
-        </button>
-        <button
-          className={`pb-2 ${
-            activeTab === "my"
-              ? "text-white border-b-2 border-[#00C896] font-semibold"
-              : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("my")}
-        >
-          My Trades
-        </button>
-      </div>
-
-      <div className="grid grid-cols-3 text-[#999] pb-1 text-xs border-b border-[#282828]">
-        <div>Price (USDT)</div>
-        <div className="text-center">Amount (BTC)</div>
-        <div className="text-right">Time</div>
-      </div>
-
-      {activeTab === "market" &&
-        trades.map((trade, idx) => (
-          <div
-            key={idx}
-            className="grid grid-cols-3 py-1 border-b border-[#1a1a1a] text-sm"
+    <div className="bg-[#121212] rounded-xl p-4 shadow-md">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex space-x-4 text-sm">
+          <button
+            onClick={() => setActiveTab('market')}
+            className={`px-3 py-1 rounded-md font-medium ${
+              activeTab === 'market'
+                ? 'bg-[#2a2a2a] text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
           >
-            <div className={`${trade.positive ? "text-green-400" : "text-red-400"}`}>
-              {trade.price}
-            </div>
-            <div className="text-center">{trade.amount}</div>
-            <div className="text-right">{trade.time}</div>
+            Market Trades
+          </button>
+          <button
+            onClick={() => setActiveTab('my')}
+            className={`px-3 py-1 rounded-md font-medium ${
+              activeTab === 'my'
+                ? 'bg-[#2a2a2a] text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            My Trades
+          </button>
+        </div>
+        <span className="text-gray-400 text-xs">Time / Price / Amount</span>
+      </div>
+
+      <div className="h-64 overflow-y-auto space-y-2 text-sm">
+        {(activeTab === 'market' ? marketTrades : myTrades).map((trade, index) => (
+          <div
+            key={index}
+            className="flex justify-between text-gray-300 hover:bg-[#2a2a2a] px-2 py-1 rounded"
+          >
+            <span className="text-xs">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span className={`font-semibold ${parseFloat(trade.change) > 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {trade.price || '0.00'}
+            </span>
+            <span>{trade.volume || '0.00'}</span>
           </div>
         ))}
-
-      {activeTab === "my" && (
-        <div className="text-center text-gray-500 py-4">
-          No recent trades yet.
-        </div>
-      )}
+      </div>
     </div>
   );
 };
