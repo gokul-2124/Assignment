@@ -1,4 +1,4 @@
-export const API_BASE = "https://assignment-1ntg.vercel.app/"
+export const API_BASE = "https://assignment-1ntg.vercel.app"
 
 // export const API_BASE = "http://localhost:5000"; 
 
