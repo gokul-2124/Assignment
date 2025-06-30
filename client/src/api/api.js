@@ -1,6 +1,6 @@
+export const API_BASE = "https://assignment-1ntg.vercel.app/"
 
-
-export const API_BASE = "http://localhost:5000"; 
+// export const API_BASE = "http://localhost:5000"; 
 
 // export const fetchMarketFeed = () => axios.get(`${API_BASE}/api/market-feed`);
 // export const fetchTopMovers = () => axios.get(`${API_BASE}/top-movers`);
